@@ -129,7 +129,7 @@ profile page (with routing!)
   comment.
 * Each user may leave exactly one private comment and one public comment.
 * Private comments are only visible to the authenticated user associated with
-  the Facebook entry. Private comments are viewable by everyone.
+  the Facebook entry. Public comments are viewable by everyone.
 * To be clear about the cardinalities here, I am allowed to leave exactly `2N`
   comments (if I comment on my own profile) on Facebook.
 
