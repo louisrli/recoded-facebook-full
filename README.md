@@ -119,6 +119,10 @@ want to do this in very small increments and pull requests ([small pull
 requests](https://essenceofcode.com/2019/10/29/the-art-of-small-pull-requests/),
 by the way, are an essential practice when working with a team).
 
+#### Profile Page
+Make a profile page so that when you click on someone's profile, it goes to their
+profile page (with routing!)
+
 #### Comments\*
 
 * On the profile of another user, each user is allowed to leave exactly one
