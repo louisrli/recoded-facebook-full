@@ -4,14 +4,15 @@ import SignUpPage from "./SignUp";
 import FacebookPage from "./Facebook";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
-
+import Navbar from './Navbar'
 function App() {
   return (
     <Container>
       <Router>
+        <Navbar />
         <Switch>
-          <Route path={"/helloworld"} component={SignUpPage} />
-          <Route path={"/facebook"} component={FacebookPage} />
+          <Route exact path={"/helloworld"} component={SignUpPage} />
+          <Route exact path={"/facebook"} component={FacebookPage} />
         </Switch>
       </Router>
     </Container>

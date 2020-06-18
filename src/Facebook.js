@@ -1,16 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import db from "./firebase";
 import Card from "react-bootstrap/Card";
-
-// These props are destructured from the Firebase field names.
+import { defaultStyle_main, defaultStyle_children } from './ReactionStyles';
+import { EmojiBox } from './EmojiBox';
 const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
   return (
-    <Card style={{ width: "18rem" }}>
+    <Card style={defaultStyle_children}>
       <Card.Img variant="top" src={imageUrl} />
       <Card.Body>
         <Card.Title>{name}</Card.Title>
         <Card.Text>{profile}</Card.Text>
         <Card.Text>{city}</Card.Text>
+        <EmojiBox />
       </Card.Body>
     </Card>
   );
@@ -18,17 +19,21 @@ const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
 
 const FacebookPage = () => {
   const [profiles, setProfiles] = React.useState([]);
-  React.useEffect(async () => {
-    const profiles = await db
-      .collection("profiles")
-      .get()
-      .then((querySnapshot) => {
-        return querySnapshot.docs.map((doc) => doc.data());
-      });
-    setProfiles(profiles);
+
+  React.useEffect(() => {
+    const doAsync = async () => {
+      const profiles = await db
+        .collection("profiles")
+        .get()
+        .then((querySnapshot) => {
+          return querySnapshot.docs.map((doc) => doc.data());
+        });
+      setProfiles(profiles);
+    };
+    profiles && doAsync();
   }, []);
   return (
-    <div>
+    <div style={defaultStyle_main}>
       {profiles.map((p) => (
         <ProfileBox {...p} />
       ))}
