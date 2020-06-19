@@ -12,7 +12,7 @@ export const EmojiBox = ({ userId, loggedInUserId }) => {
         const EMOJI_DOC_OF_SUBCOL = db.collection('profiles').doc(userId).collection('reactions').doc(loggedInUserId);
         if (EMOJI_DOC_OF_SUBCOL) {
             EMOJI_DOC_OF_SUBCOL.onSnapshot(docSnapshot => {
-                if (docSnapshot.data()) {
+                if (docSnapshot.data() && isMount) {
                     setActiveEmoji(docSnapshot.data().emoji)
                 } else {
                     setActiveEmoji(DEFAULT_EMOJI)

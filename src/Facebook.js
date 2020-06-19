@@ -27,7 +27,8 @@ const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
         <Card.Title>{name}</Card.Title>
         <Card.Text>{profile}</Card.Text>
         <Card.Text>{city}</Card.Text>
-        {loggedInUserId ? <EmojiBox userId={userId} loggedInUserId={loggedInUserId} /> : <span className="need-Login">Log-in to see reactions.</span>}
+        {loggedInUserId ? <EmojiBox userId={userId} loggedInUserId={loggedInUserId} />
+          : <span className="need-Login">Log-in to see reactions.</span>}
         {userId === loggedInUserId && <EditProfile userId={loggedInUserId} />}
       </Card.Body>
     </Card>
@@ -70,21 +71,29 @@ const FacebookPage = () => {
   const [profiles, setProfiles] = React.useState([]);
 
   React.useEffect(() => {
-      const doAsync = async () => {
-        const profiles = await db
-          .collection("profiles")
-          .get()
-          .then((querySnapshot) => {
-            return querySnapshot.docs.map((doc) => doc.data());
-          });
+    let isMount = true;
+    const doAsync = async () => {
+      const profiles = await db
+        .collection("profiles")
+        .get()
+        .then((querySnapshot) => {
+          return querySnapshot.docs.map((doc) => doc.data());
+        });
+      if (isMount) {
         setProfiles(profiles);
       };
-      profiles && doAsync();
-    
+    };
+    if (profiles) {
+      doAsync();
+    }
+    return () => {
+      isMount = false;
+    };
   }, []);
+
   return (
     <div style={defaultStyle_main}>
-      {profiles.map((p, idx) => (
+      {profiles && profiles.map((p, idx) => (
         <ProfileBox key={p + idx} {...p} />
       ))}
     </div>
