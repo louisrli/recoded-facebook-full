@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { default_ul, DEFAULT_EMOJI, EMOJI_ARRAY, container_absolute } from './ReactionStyles';
+import { UL_CUSTOM, DEFAULT_EMOJI, EMOJI_ARRAY, CONTAINER_CUSTOM } from './ReactionStyles';
 import Container from "react-bootstrap/Container";
 import db from "./firebase";
 
@@ -32,17 +32,17 @@ export const EmojiBox = ({ userId, loggedInUserId }) => {
             <span>{item}</span>
         </li>);
 
-    return <Container style={container_absolute}>
+    return <CONTAINER_CUSTOM>
         <span className='reaction_class'>Drop a voodoo chant!</span>
         <Container style={{ textAlign: 'center' }}
             onClick={() => setToggleEmoji(!toggleEmoji)}>
             <span style={{ cursor: 'pointer' }}>{activeEmoji}</span>
 
             {toggleEmoji &&
-                <ul style={default_ul}>
+                <UL_CUSTOM>
                     {emojiMap()}
-                </ul>
+                </UL_CUSTOM>
             }
         </Container>
-    </Container>
+    </CONTAINER_CUSTOM>
 }

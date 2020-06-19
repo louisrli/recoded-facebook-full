@@ -1,7 +1,7 @@
 import React from "react";
 import db from "./firebase";
 import Card from "react-bootstrap/Card";
-import { defaultStyle_main, defaultStyle_children } from './ReactionStyles';
+import { CARD_CONTAINER, CARD_CHILDREN } from './ReactionStyles';
 import { EmojiBox } from './EmojiBox';
 import firebase from "firebase";
 const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
@@ -21,7 +21,7 @@ const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
   }, []);
 
   return (
-    <Card style={defaultStyle_children}>
+    <CARD_CHILDREN className="card">
       <Card.Img variant="top" src={imageUrl} />
       <Card.Body>
         <Card.Title>{name}</Card.Title>
@@ -31,7 +31,7 @@ const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
           : <span className="need-Login">Log-in to see reactions.</span>}
         {userId === loggedInUserId && <EditProfile userId={loggedInUserId} />}
       </Card.Body>
-    </Card>
+    </CARD_CHILDREN>
   );
 };
 
@@ -92,11 +92,11 @@ const FacebookPage = () => {
   }, []);
 
   return (
-    <div style={defaultStyle_main}>
+    <CARD_CONTAINER>
       {profiles && profiles.map((p, idx) => (
         <ProfileBox key={p + idx} {...p} />
       ))}
-    </div>
+    </CARD_CONTAINER>
   );
 };
 
