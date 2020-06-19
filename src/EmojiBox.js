@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { default_ul, defaultEmoji, emojiArr, container_absolute } from './ReactionStyles';
+import { default_ul, DEFAULT_EMOJI, EMOJI_ARRAY, container_absolute } from './ReactionStyles';
 import Container from "react-bootstrap/Container";
 import db from "./firebase";
 
@@ -9,16 +9,14 @@ export const EmojiBox = ({ userId, loggedInUserId }) => {
 
     useEffect(() => {
         let isMount = true;
-        const holder = db.collection('profiles').doc(userId).collection('reactions').doc(loggedInUserId);
-        if (holder) {
-            holder.onSnapshot(docSnapshot => {
+        const EMOJI_DOC_OF_SUBCOL = db.collection('profiles').doc(userId).collection('reactions').doc(loggedInUserId);
+        if (EMOJI_DOC_OF_SUBCOL) {
+            EMOJI_DOC_OF_SUBCOL.onSnapshot(docSnapshot => {
                 if (docSnapshot.data()) {
                     setActiveEmoji(docSnapshot.data().emoji)
                 } else {
-                    setActiveEmoji(defaultEmoji)
+                    setActiveEmoji(DEFAULT_EMOJI)
                 }
-            }, err => {
-                console.log(`Encountered error: ${err}`);
             });
         }
         return () => isMount = false;
@@ -29,7 +27,7 @@ export const EmojiBox = ({ userId, loggedInUserId }) => {
         });
     };
 
-    const emojiMap = () => emojiArr.map((item, idx) =>
+    const emojiMap = () => EMOJI_ARRAY.map((item, idx) =>
         <li key={idx} id={idx} style={{ cursor: 'pointer' }} onClick={handleEmojiClick}>
             <span>{item}</span>
         </li>);

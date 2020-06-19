@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import db from "./firebase";
 import Card from "react-bootstrap/Card";
 import { defaultStyle_main, defaultStyle_children } from './ReactionStyles';
