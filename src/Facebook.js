@@ -47,40 +47,44 @@ const ProfileBox = ({city, imageUrl, name, profile, userId}) => {
 const EditProfile = (props) => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [image, setImage] = React.useState(null);
-  const [url, setUrl] = React.useState('');
-  const [progress, setProgress] = React.useState(0);
+  const [imageUrl, setImageUrl] = React.useState('');
+  const [uploadProgress, setUploadProgress] = React.useState(0);
   const showEditInputs = () => {
     setIsEditing(true);
   };
-  const handleChange = (e) => {
+  const handleChooseImage = (e) => {
     if (e.target.files[0]) {
       setImage(e.target.files[0]);
     }
   };
   const handleUpload = () => {
-    const uploadTask = storage.ref(`images/${image.name}`).put(image);
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
+    if (image != null) {
+      const uploadTask = storage
+        .ref(`profilePictures/${props.userId}/${image.name}`)
+        .put(image);
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
 
-        setProgress(progress);
-      },
-      (error) => {
-        console.log(error);
-      },
-      () => {
-        storage
-          .ref('images')
-          .child(image.name)
-          .getDownloadURL()
-          .then((url) => {
-            setUrl(url);
-          });
-      }
-    );
+          setUploadProgress(progress);
+        },
+        (error) => {
+          console.log(error);
+        },
+        () => {
+          storage
+            .ref(`profilePictures/${props.userId}`)
+            .child(image.name)
+            .getDownloadURL()
+            .then((url) => {
+              setImageUrl(url);
+            });
+        }
+      );
+    }
   };
 
   const hideAndSubmitEditInputs = (e) => {
@@ -95,7 +99,7 @@ const EditProfile = (props) => {
         profile: profileInputValue
           ? profileInputValue
           : props.userDetails.profile,
-        imageUrl: url ? url : props.userDetails.originalImageUrl,
+        imageUrl: imageUrl ? imageUrl : props.userDetails.originalImageUrl,
       });
 
     setIsEditing(false);
@@ -106,8 +110,8 @@ const EditProfile = (props) => {
       <form onSubmit={(e) => hideAndSubmitEditInputs(e)}>
         <input type='text' placeholder='Profile' />
         <input type='text' placeholder='City' />
-        <progress value={progress} max='100' />
-        <input type='file' onChange={handleChange} />
+        <progress value={uploadProgress} max='100' />
+        <input type='file' onChange={handleChooseImage} />
         <button type='button' onClick={handleUpload}>
           Upload
         </button>
