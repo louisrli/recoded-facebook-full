@@ -4,7 +4,8 @@ import SignUp from "./SignUp";
 import Facebook from "./Facebook";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Container from "react-bootstrap/Container";
-import Navbar from './Navbar'
+import Navbar from './Navbar';
+
 function App() {
   return (
     <Container>

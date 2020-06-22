@@ -4,6 +4,7 @@ import Card from "react-bootstrap/Card";
 import { CardContainer, CardChildren } from './EmojiBox.styles';
 import { EmojiBox } from './EmojiBox';
 import firebase from "firebase";
+import { storage } from './firebase';
 
 const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
   const [loggedInUserId, setLoggedInUserId] = React.useState("")
@@ -12,13 +13,13 @@ const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
       if (user) {
         setLoggedInUserId(user.uid);
       } else {
-        console.log('error')
+        console.log('error');
       }
     });
-  }
+  };
 
   React.useEffect(() => {
-    getUserId()
+    getUserId();
   }, []);
 
   return (
@@ -30,7 +31,16 @@ const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
         <Card.Text>{city}</Card.Text>
         {loggedInUserId ? <EmojiBox userId={userId} loggedInUserId={loggedInUserId} />
           : <span className="need-Login">Log-in to see reactions.</span>}
-        {userId === loggedInUserId && <EditProfile userId={loggedInUserId} />}
+        {userId === loggedInUserId && (
+          <EditProfile
+            userId={loggedInUserId}
+            userDetails={{
+              city: city,
+              profile: profile,
+              originalImageUrl: imageUrl,
+            }}
+          />
+        )}
       </Card.Body>
     </CardChildren>
   );
@@ -38,36 +48,90 @@ const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
 
 const EditProfile = (props) => {
   const [isEditing, setIsEditing] = React.useState(false);
+  const [image, setImage] = React.useState(null);
+  const [imageUrl, setImageUrl] = React.useState('');
+  const [uploadProgress, setUploadProgress] = React.useState(0);
   const showEditInputs = () => {
     setIsEditing(true);
-  }
+  };
+  const handleChooseImage = (e) => {
+    if (e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+  const handleUpload = () => {
+    if (image != null) {
+      const uploadTask = storage
+        .ref(`profilePictures/${props.userId}/${image.name}`)
+        .put(image);
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setUploadProgress(progress);
+        },
+        (error) => {
+          console.log(error);
+        },
+        () => {
+          storage
+            .ref(`profilePictures/${props.userId}`)
+            .child(image.name)
+            .getDownloadURL()
+            .then((url) => {
+              setImageUrl(url);
+            });
+        }
+      );
+    }
+  };
 
   const hideAndSubmitEditInputs = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     const cityInputValue = e.target[1].value;
     const profileInputValue = e.target[0].value;
-    db.collection("profiles").doc(props.userId).update({
-      city: cityInputValue,
-      profile: profileInputValue
-    })
+
+    db.collection('profiles')
+      .doc(props.userId)
+      .update({
+        city: cityInputValue ? cityInputValue : props.userDetails.city,
+        profile: profileInputValue
+          ? profileInputValue
+          : props.userDetails.profile,
+        imageUrl: imageUrl ? imageUrl : props.userDetails.originalImageUrl,
+      });
     setIsEditing(false);
-  }
+  };
 
   const formFields = () => {
     return (
       <form onSubmit={(e) => hideAndSubmitEditInputs(e)}>
-        <input type="text" placeholder="Profile" />
-        <input type="text" placeholder="City" />
+        <input type='text' placeholder='Profile' />
+        <input type='text' placeholder='City' />
+        <progress value={uploadProgress} max='100' />
+        <input type='file' onChange={handleChooseImage} />
+        <button type='button' onClick={handleUpload}>
+          Upload
+        </button>
+
         <button>submit</button>
       </form>
-    )
-  }
+    );
+  };
+
   return (
     <div>
-      {isEditing === false ? <button onClick={showEditInputs} >Edit Profile</button> : formFields()}
+      {isEditing === false ? (
+        <button onClick={showEditInputs}>Edit Profile</button>
+      ) : (
+          formFields()
+        )}
     </div>
-  )
-}
+  );
+};
+
 const FacebookPage = () => {
   const [profiles, setProfiles] = React.useState([]);
   const isMounted = React.useRef(false);
@@ -86,7 +150,7 @@ const FacebookPage = () => {
       };
     };
     doAsync();
-    return () => (isMounted.current = false);
+    return () => (isMounted.current = false)
   }, []);
 
   return (

@@ -21,7 +21,7 @@ export const EmojiBox = ({ userId, loggedInUserId }) => {
             });
         }
         return () => (isMounted.current = false);
-    }, [activeEmoji]);
+    }, []);
 
     const handleEmojiClick = (e) => {
         db.collection(`profiles`).doc(userId).collection('reactions').doc(loggedInUserId).set({
