@@ -11,9 +11,9 @@ export const EmojiBox = ({ userId, loggedInUserId }) => {
     useEffect(() => {
         isMounted.current = true;
         const emojiDocOfSubCol = db.collection('profiles').doc(userId).collection('reactions').doc(loggedInUserId);
-        if (emojiDocOfSubCol && isMounted.current) {
+        if (emojiDocOfSubCol) {
             emojiDocOfSubCol.onSnapshot(docSnapshot => {
-                if (docSnapshot.data()) {
+                if (docSnapshot.data() && isMounted.current) {
                     setActiveEmoji(docSnapshot.data().emoji)
                 } else {
                     setActiveEmoji(DEFAULT_EMOJI)
