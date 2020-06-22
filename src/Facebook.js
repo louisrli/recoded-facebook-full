@@ -1,9 +1,10 @@
 import React from "react";
 import db from "./firebase";
 import Card from "react-bootstrap/Card";
-import { CARD_CONTAINER, CARD_CHILDREN } from './ReactionStyles';
+import { CardContainer, CardChildren } from './EmojiBox.styles';
 import { EmojiBox } from './EmojiBox';
 import firebase from "firebase";
+
 const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
   const [loggedInUserId, setLoggedInUserId] = React.useState("")
   const getUserId = () => {
@@ -21,7 +22,7 @@ const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
   }, []);
 
   return (
-    <CARD_CHILDREN className="card">
+    <CardChildren className="card">
       <Card.Img variant="top" src={imageUrl} />
       <Card.Body>
         <Card.Title>{name}</Card.Title>
@@ -31,7 +32,7 @@ const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
           : <span className="need-Login">Log-in to see reactions.</span>}
         {userId === loggedInUserId && <EditProfile userId={loggedInUserId} />}
       </Card.Body>
-    </CARD_CHILDREN>
+    </CardChildren>
   );
 };
 
@@ -69,9 +70,9 @@ const EditProfile = (props) => {
 }
 const FacebookPage = () => {
   const [profiles, setProfiles] = React.useState([]);
+  const isMounted = React.useRef(false);
 
   React.useEffect(() => {
-    let isMount = true;
     const doAsync = async () => {
       const profiles = await db
         .collection("profiles")
@@ -79,24 +80,21 @@ const FacebookPage = () => {
         .then((querySnapshot) => {
           return querySnapshot.docs.map((doc) => doc.data());
         });
-      if (isMount) {
+      if (profiles) {
         setProfiles(profiles);
+        isMounted.current = true;
       };
     };
-    if (profiles) {
-      doAsync();
-    }
-    return () => {
-      isMount = false;
-    };
+    doAsync();
+    return () => (isMounted.current = false);
   }, []);
 
   return (
-    <CARD_CONTAINER>
+    <CardContainer>
       {profiles && profiles.map((p, idx) => (
-        <ProfileBox key={p + idx} {...p} />
+        <ProfileBox key={idx} {...p} />
       ))}
-    </CARD_CONTAINER>
+    </CardContainer>
   );
 };
 
