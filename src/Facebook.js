@@ -134,24 +134,22 @@ const EditProfile = (props) => {
 
 const FacebookPage = () => {
   const [profiles, setProfiles] = React.useState([]);
-  const isMounted = React.useRef(false);
 
   React.useEffect(() => {
-    const doAsync = async () => {
-      const profiles = await db
-        .collection("profiles")
-        .get()
-        .then((querySnapshot) => {
-          return querySnapshot.docs.map((doc) => doc.data());
-        });
-      if (profiles) {
-        setProfiles(profiles);
-        isMounted.current = true;
-      };
-    };
     doAsync();
-    return () => (isMounted.current = false)
   }, []);
+
+  const doAsync = async () => {
+    const profiles = await db
+      .collection("profiles")
+      .get()
+      .then((querySnapshot) => {
+        return querySnapshot.docs.map((doc) => doc.data());
+      });
+    if (profiles) {
+      setProfiles(profiles);
+    };
+  };
 
   return (
     <CardContainer>
