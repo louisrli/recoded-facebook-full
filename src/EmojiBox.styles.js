@@ -27,6 +27,8 @@ export const ContainerCustom = styled.div`
     left: 50%;
     transform: translateX(-50%);`
 
+//emoji source: https://unicode.org/emoji/charts/full-emoji-list.html
+
 export const DEFAULT_EMOJI = '\u{1f9d9}';
+
 export const EMOJI_ARRAY = ['\u{1f604}', '\u{1f929}', '\u{1f621}', '\u{1f47b}', '\u{1f47e}'];
-////https://unicode.org/emoji/charts/full-emoji-list.html

@@ -6,22 +6,19 @@ import db from "./firebase";
 export const EmojiBox = ({ userId, loggedInUserId }) => {
     const [toggleEmoji, setToggleEmoji] = useState(false);
     const [activeEmoji, setActiveEmoji] = useState(null);
-    const isMounted = React.useRef(null);
 
     useEffect(() => {
-        isMounted.current = true;
         const emojiDocOfSubCol = db.collection('profiles').doc(userId).collection('reactions').doc(loggedInUserId);
         if (emojiDocOfSubCol) {
             emojiDocOfSubCol.onSnapshot(docSnapshot => {
-                if (docSnapshot.data() && isMounted.current) {
+                if (docSnapshot.data()) {
                     setActiveEmoji(docSnapshot.data().emoji)
                 } else {
                     setActiveEmoji(DEFAULT_EMOJI)
                 }
             });
         }
-        return () => isMounted.current = false;
-    }, []);
+    }, [userId, loggedInUserId]);
 
     const handleEmojiClick = (e) => {
         db.collection(`profiles`).doc(userId).collection('reactions').doc(loggedInUserId).set({

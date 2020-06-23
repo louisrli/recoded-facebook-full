@@ -8,17 +8,17 @@ import { storage } from './firebase';
 
 const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
   const [loggedInUserId, setLoggedInUserId] = React.useState("")
-  const getUserId = () => {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        setLoggedInUserId(user.uid);
-      } else {
-        console.log('error');
-      }
-    });
-  };
 
   React.useEffect(() => {
+    const getUserId = () => {
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          setLoggedInUserId(user.uid);
+        } else {
+          console.log('error');
+        }
+      });
+    };
     getUserId();
   }, []);
 
@@ -30,7 +30,7 @@ const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
         <Card.Text>{profile}</Card.Text>
         <Card.Text>{city}</Card.Text>
         {loggedInUserId ? <EmojiBox userId={userId} loggedInUserId={loggedInUserId} />
-          : <span className="need-Login">Log-in to see reactions.</span>}
+          : <span>Log-in to see reactions.</span>}
         {userId === loggedInUserId && (
           <EditProfile
             userId={loggedInUserId}
@@ -51,14 +51,17 @@ const EditProfile = (props) => {
   const [image, setImage] = React.useState(null);
   const [imageUrl, setImageUrl] = React.useState('');
   const [uploadProgress, setUploadProgress] = React.useState(0);
+
   const showEditInputs = () => {
     setIsEditing(true);
   };
+
   const handleChooseImage = (e) => {
     if (e.target.files[0]) {
       setImage(e.target.files[0]);
     }
   };
+
   const handleUpload = () => {
     if (image != null) {
       const uploadTask = storage
@@ -115,7 +118,6 @@ const EditProfile = (props) => {
         <button type='button' onClick={handleUpload}>
           Upload
         </button>
-
         <button>submit</button>
       </form>
     );
@@ -136,20 +138,19 @@ const FacebookPage = () => {
   const [profiles, setProfiles] = React.useState([]);
 
   React.useEffect(() => {
+    const doAsync = async () => {
+      const profiles = await db
+        .collection("profiles")
+        .get()
+        .then((querySnapshot) => {
+          return querySnapshot.docs.map((doc) => doc.data());
+        });
+      if (profiles) {
+        setProfiles(profiles);
+      };
+    };
     doAsync();
   }, []);
-
-  const doAsync = async () => {
-    const profiles = await db
-      .collection("profiles")
-      .get()
-      .then((querySnapshot) => {
-        return querySnapshot.docs.map((doc) => doc.data());
-      });
-    if (profiles) {
-      setProfiles(profiles);
-    };
-  };
 
   return (
     <CardContainer>
