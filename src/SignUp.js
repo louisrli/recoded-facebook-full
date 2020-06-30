@@ -46,7 +46,7 @@ const SignUpPage = () => {
         <Form.Group>
           {!user && (
             <div onClick={handleGoogleAuthClick} style={{ cursor: "pointer" }}>
-              <img src={require("./google-signin.png")} />
+              <img src={require("./google-signin.png")} alt={`${user.displayName}'s avatar`} />
             </div>
           )}
           {user && <div>You're logged in as {user.email}</div>}

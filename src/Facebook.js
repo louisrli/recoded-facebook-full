@@ -1,34 +1,36 @@
-import React from 'react';
-import db from './firebase';
-import Card from 'react-bootstrap/Card';
-import firebase from 'firebase';
-import {storage} from './firebase';
+import React from "react";
+import db from "./firebase";
+import Card from "react-bootstrap/Card";
+import { CardContainer, CardChildren } from './EmojiBox.styles';
+import { EmojiBox } from './EmojiBox';
+import firebase from "firebase";
+import { storage } from './firebase';
 
-// These props are destructured from the Firebase field names.
-const ProfileBox = ({city, imageUrl, name, profile, userId}) => {
-  const [loggedInUserId, setLoggedInUserId] = React.useState('');
-
-  const getUserId = () => {
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        setLoggedInUserId(user.uid);
-      } else {
-        console.log('error');
-      }
-    });
-  };
+const ProfileBox = ({ city, imageUrl, name, profile, userId }) => {
+  const [loggedInUserId, setLoggedInUserId] = React.useState("")
 
   React.useEffect(() => {
+    const getUserId = () => {
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          setLoggedInUserId(user.uid);
+        } else {
+          console.log('error');
+        }
+      });
+    };
     getUserId();
   }, []);
 
   return (
-    <Card style={{width: '18rem'}}>
-      <Card.Img variant='top' src={imageUrl} />
+    <CardChildren className="card">
+      <Card.Img variant="top" src={imageUrl} />
       <Card.Body>
         <Card.Title>{name}</Card.Title>
         <Card.Text>{profile}</Card.Text>
         <Card.Text>{city}</Card.Text>
+        {loggedInUserId ? <EmojiBox userId={userId} loggedInUserId={loggedInUserId} />
+          : <span>Log-in to see reactions.</span>}
         {userId === loggedInUserId && (
           <EditProfile
             userId={loggedInUserId}
@@ -40,7 +42,7 @@ const ProfileBox = ({city, imageUrl, name, profile, userId}) => {
           />
         )}
       </Card.Body>
-    </Card>
+    </CardChildren>
   );
 };
 
@@ -49,14 +51,17 @@ const EditProfile = (props) => {
   const [image, setImage] = React.useState(null);
   const [imageUrl, setImageUrl] = React.useState('');
   const [uploadProgress, setUploadProgress] = React.useState(0);
+
   const showEditInputs = () => {
     setIsEditing(true);
   };
+
   const handleChooseImage = (e) => {
     if (e.target.files[0]) {
       setImage(e.target.files[0]);
     }
   };
+
   const handleUpload = () => {
     if (image != null) {
       const uploadTask = storage
@@ -68,7 +73,6 @@ const EditProfile = (props) => {
           const progress = Math.round(
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100
           );
-
           setUploadProgress(progress);
         },
         (error) => {
@@ -101,7 +105,6 @@ const EditProfile = (props) => {
           : props.userDetails.profile,
         imageUrl: imageUrl ? imageUrl : props.userDetails.originalImageUrl,
       });
-
     setIsEditing(false);
   };
 
@@ -115,7 +118,6 @@ const EditProfile = (props) => {
         <button type='button' onClick={handleUpload}>
           Upload
         </button>
-
         <button>submit</button>
       </form>
     );
@@ -126,29 +128,36 @@ const EditProfile = (props) => {
       {isEditing === false ? (
         <button onClick={showEditInputs}>Edit Profile</button>
       ) : (
-        formFields()
-      )}
+          formFields()
+        )}
     </div>
   );
 };
 
 const FacebookPage = () => {
   const [profiles, setProfiles] = React.useState([]);
-  React.useEffect(async () => {
-    const profiles = await db
-      .collection('profiles')
-      .get()
-      .then((querySnapshot) => {
-        return querySnapshot.docs.map((doc) => doc.data());
-      });
-    setProfiles(profiles);
+
+  React.useEffect(() => {
+    const doAsync = async () => {
+      const profiles = await db
+        .collection("profiles")
+        .get()
+        .then((querySnapshot) => {
+          return querySnapshot.docs.map((doc) => doc.data());
+        });
+      if (profiles) {
+        setProfiles(profiles);
+      };
+    };
+    doAsync();
   }, []);
+
   return (
-    <div>
-      {profiles.map((p) => (
-        <ProfileBox {...p} />
+    <CardContainer>
+      {profiles && profiles.map((p, idx) => (
+        <ProfileBox key={idx} {...p} />
       ))}
-    </div>
+    </CardContainer>
   );
 };
 
